@@ -28,12 +28,30 @@ class ProductsController extends Controller
     }
 
     public function store(Request $request) {
-
-        Products::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'description' => $request->description,
+        $validatedData = $request->validate([
+            'name' => 'required|unique:products,name|string|max:255',
+            'price' => 'required|numeric|between:0,999999.99',
+            'description' => 'required|string|max:2048',
         ]);
+
+        Products::create($validatedData);
+        return redirect()->route('products.index');
+    }
+
+    public function edit($id) {
+        $product = Products::find($id);
+        return view('products.edit', compact('product'));
+    }
+
+    public function update(Request $request, $id) {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255|unique:products,name,' . $id,
+            'price' => 'required|numeric|between:0,999999.99',
+            'description' => 'required|string|max:2048',
+        ]);
+
+        $product = Products::find($id);
+        $product->update($validatedData);
         return redirect()->route('products.index');
     }
 }
