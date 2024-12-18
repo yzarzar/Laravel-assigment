@@ -28,6 +28,9 @@
             <label for="name" class="block mb-2 text-lg">
                 Name:
                 <input type="text" name="name" id="name" value="{{ $category->name }}" class="px-2 py-1 w-full rounded border border-gray-300">
+                @error('name')
+                    <p class="text-sm text-red-500">{{ $message }}</p>
+                @enderror
             </label>
             <button type="submit" class="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">Update</button>
         </form>
