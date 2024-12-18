@@ -10,6 +10,7 @@ Route::get('/', function () {
 Route::group(['prefix' => 'products'], function () {
     Route::get('/', [ProductsController::class, 'index'])->name('products.index');
     Route::get('/create', [ProductsController::class, 'create'])->name('products.create');
+    Route::post('/', [ProductsController::class, 'store'])->name('products.store');
     Route::get('/{id}', [ProductsController::class, 'show'])->name('products.show');
     Route::delete('/{id}', [ProductsController::class, 'destroy'])->name('products.destroy');
 });

@@ -26,4 +26,14 @@ class ProductsController extends Controller
         $product->delete();
         return redirect()->route('products.index');
     }
+
+    public function store(Request $request) {
+
+        Products::create([
+            'name' => $request->name,
+            'price' => $request->price,
+            'description' => $request->description,
+        ]);
+        return redirect()->route('products.index');
+    }
 }
