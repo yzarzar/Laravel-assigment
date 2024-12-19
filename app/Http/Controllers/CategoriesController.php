@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CategoryRequest;
 use App\Models\Categories;
 use Illuminate\Http\Request;
 
@@ -16,13 +17,16 @@ class CategoriesController extends Controller
         return view('categories.create');
     }
 
-    public function store(Request $request) {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ]);
+    public function store(CategoryRequest $request) {
+        $validatedData = $request->validated();
 
-        Categories::create($request->all());
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+        }
 
+        Categories::create($validatedData);
         return redirect()->route('categories.index');
     }
 
@@ -42,10 +46,14 @@ class CategoriesController extends Controller
         return view('categories.edit', compact('category'));
     }
 
-    public function update(Request $request, $id) {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $id,
-        ]);
+    public function update(CategoryRequest $request, $id) {
+        $validatedData = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+        }
 
         $category = Categories::find($id);
         $category->update($validatedData);

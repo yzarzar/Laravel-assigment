@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProductRequest;
 use App\Models\Products;
 use Illuminate\Http\Request;
 
@@ -27,12 +28,16 @@ class ProductsController extends Controller
         return redirect()->route('products.index');
     }
 
-    public function store(Request $request) {
-        $validatedData = $request->validate([
-            'name' => 'required|unique:products,name|string|max:255',
-            'price' => 'required|numeric|between:0,999999.99',
-            'description' => 'required|string|max:2048',
-        ]);
+    public function store(ProductRequest $request) {
+        $validatedData = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+        }
+
+        $validatedData['status'] = $request->has('status');
 
         Products::create($validatedData);
         return redirect()->route('products.index');
@@ -43,12 +48,16 @@ class ProductsController extends Controller
         return view('products.edit', compact('product'));
     }
 
-    public function update(Request $request, $id) {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255|unique:products,name,' . $id,
-            'price' => 'required|numeric|between:0,999999.99',
-            'description' => 'required|string|max:2048',
-        ]);
+    public function update(ProductRequest $request, $id) {
+        $validatedData = $request->validated();
+
+        $validatedData['status'] = $request->has('status');
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+        }
 
         $product = Products::find($id);
         $product->update($validatedData);

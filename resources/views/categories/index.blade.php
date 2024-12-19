@@ -26,6 +26,7 @@
                     <tr>
                         <th class="px-4 py-2 w-16 text-left border-t border-b">ID</th>
                         <th class="px-4 py-2 w-1/2 text-left border-t border-b">Name</th>
+                        <th class="px-4 py-2 w-1/2 text-left border-t border-b">Image</th>
                         <th class="px-4 py-2 w-1/2 text-left border-t border-b">Actions</th>
                     </tr>
                 </thead>
@@ -34,6 +35,9 @@
                         <tr>
                             <td class="px-4 py-2 border-t border-b">{{ $category->id }}</td>
                             <td class="px-4 py-2 border-t border-b">{{ $category->name }}</td>
+                            <td class="px-4 py-2 border-t border-b">
+                                <img src="{{ asset('images/' . $category->image) }}" alt="{{ $category->name }}" class="object-cover w-16 h-16 rounded">
+                            </td>
                             <td class="flex gap-2 px-4 py-2 border-t border-b">
                                 <a href="{{ route('categories.show', $category->id) }}" class="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">Details</a>
                                 <a href="{{ route('categories.edit', $category->id) }}" class="px-4 py-2 font-bold text-white bg-yellow-500 rounded hover:bg-yellow-700">Edit</a>

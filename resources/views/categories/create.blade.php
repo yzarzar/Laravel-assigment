@@ -20,13 +20,20 @@
     <div class="container p-4 mx-auto">
         <h1 class="mb-4 text-3xl font-bold">Add New Category</h1>
         <a href="{{ route('categories.index') }}" class="inline-block px-4 py-2 mb-4 text-white bg-gray-700 rounded hover:bg-gray-900"><- Back</a>
-        <form action="{{ route('categories.store') }}" method="POST" class="space-y-4">
+        <form action="{{ route('categories.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
             @csrf
             @method('POST')
             <label for="name" class="block mb-2 text-lg">
                 Name:
                 <input type="text" name="name" id="name" class="px-2 py-1 w-full rounded border border-gray-300">
                 @error('name')
+                    <p class="text-sm text-red-500">{{ $message }}</p>
+                @enderror
+            </label>
+            <label for="image" class="block mb-2 text-lg">
+                Image:
+                <input type="file" name="image" id="image" class="px-2 py-1 w-full rounded border border-gray-300">
+                @error('image')
                     <p class="text-sm text-red-500">{{ $message }}</p>
                 @enderror
             </label>
