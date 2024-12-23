@@ -10,6 +10,7 @@ class CategoriesController extends Controller
     private $categoryRepository;
 
     public function __construct(CategoryRepositoryInterface $categoryRepository) {
+        $this->middleware('auth');
         $this->categoryRepository = $categoryRepository;
     }
 
