@@ -4,12 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Models\Products;
+use App\Repositories\Product\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
+    private $productRepository;
+
+    public function __construct(ProductRepositoryInterface $productRepository) {
+        $this->productRepository = $productRepository;
+    }
+
     public function index() {
-        $products = Products::all();
+        $products = $this->productRepository->index();
         return view('products.index', compact('products'));
     }
 
@@ -18,13 +25,12 @@ class ProductsController extends Controller
     }
 
     public function show($id) {
-        $product = Products::find($id);
+        $product = $this->productRepository->show($id);
         return view('products.show', compact('product'));
     }
 
     public function destroy($id) {
-        $product = Products::find($id);
-        $product->delete();
+        $this->productRepository->delete($id);
         return redirect()->route('products.index');
     }
 
@@ -39,17 +45,25 @@ class ProductsController extends Controller
 
         $validatedData['status'] = $request->has('status');
 
-        Products::create($validatedData);
+        $this->productRepository->store($validatedData);
         return redirect()->route('products.index');
     }
 
     public function edit($id) {
-        $product = Products::find($id);
+        $product = $this->productRepository->show($id);
         return view('products.edit', compact('product'));
     }
 
     public function update(ProductRequest $request, $id) {
         $validatedData = $request->validated();
+
+        $product = $this->productRepository->show($id);
+        if (isset($product->image)) {
+            $imagePath = public_path('images/' . $product->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
 
         $validatedData['status'] = $request->has('status');
 
@@ -59,8 +73,7 @@ class ProductsController extends Controller
             $validatedData = array_merge($validatedData, ['image' => $imageName]);
         }
 
-        $product = Products::find($id);
-        $product->update($validatedData);
+        $this->productRepository->update($validatedData, $id);
         return redirect()->route('products.index');
     }
 }

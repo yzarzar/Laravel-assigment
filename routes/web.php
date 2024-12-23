@@ -29,3 +29,7 @@ Route::group(['prefix' => 'categories'], function () {
     Route::get('/{id}/edit', [CategoriesController::class, 'edit'])->name('categories.edit');
     Route::post('/{id}', [CategoriesController::class, 'update'])->name('categories.update');
 });
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
