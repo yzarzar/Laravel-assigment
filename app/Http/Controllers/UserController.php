@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserRequest;
 use App\Repositories\User\UserRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -20,13 +21,13 @@ class UserController extends Controller
         return view('users.show', compact('user'));
     }
 
-    public function update(Request $request, $id)
+    public function update(UserRequest $request, $id)
     {
         $this->userRepository->update($request->all(), $id);
         return redirect()->route('user.show', $id);
     }
 
-    public function store(Request $request)
+    public function store(UserRequest $request)
     {
         $this->userRepository->store($request->all());
         return redirect()->route('users.index');
@@ -49,7 +50,7 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
-    public function updateAnotherUser(Request $request, $id)
+    public function updateAnotherUser(UserRequest $request, $id)
     {
         $this->userRepository->updateAnotherUser($request->all(), $id);
         return redirect()->route('users.index', $id);
