@@ -23,6 +23,12 @@ class ProductRepository implements ProductRepositoryInterface {
 
     public function delete($id) {
         $product = Products::find($id);
+        if (isset($product->image)) {
+            $imagePath = public_path('images/' . $product->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
         $product->delete();
         return $product;
     }

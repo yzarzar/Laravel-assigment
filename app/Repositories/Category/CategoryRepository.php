@@ -28,6 +28,14 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
     public function delete($id) {
         $category = Categories::find($id);
+
+        if (isset($category->image)) {
+            $imagePath = public_path('images/' . $category->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        
         $category->delete();
         return $category;
     }
