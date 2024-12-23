@@ -22,6 +22,14 @@ class CategoryRepository implements CategoryRepositoryInterface {
 
     public function update(array $data, $id) {
         $category = Categories::find($id);
+
+        if (isset($data['image'])) {
+            $imagePath = public_path('images/' . $category->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
         $category->update($data);
         return $category;
     }
@@ -35,7 +43,7 @@ class CategoryRepository implements CategoryRepositoryInterface {
                 unlink($imagePath);
             }
         }
-        
+
         $category->delete();
         return $category;
     }

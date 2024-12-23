@@ -17,6 +17,14 @@ class ProductRepository implements ProductRepositoryInterface {
 
     public function update(array $data, $id) {
         $product = Products::find($id);
+
+        if (isset($data['image'])) {
+            $imagePath = public_path('images/' . $product->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
         $product->update($data);
         return $product;
     }

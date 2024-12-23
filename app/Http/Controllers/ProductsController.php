@@ -57,14 +57,6 @@ class ProductsController extends Controller
     public function update(ProductRequest $request, $id) {
         $validatedData = $request->validated();
 
-        $product = $this->productRepository->show($id);
-        if (isset($product->image)) {
-            $imagePath = public_path('images/' . $product->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-        }
-
         $validatedData['status'] = $request->has('status');
 
         if ($request->hasFile('image')) {
