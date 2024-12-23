@@ -23,9 +23,10 @@ class ProductRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|between:0,999999.99',
             'description' => 'required|string|max:2048',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5120',
             'status' => 'nullable',
         ];
     }

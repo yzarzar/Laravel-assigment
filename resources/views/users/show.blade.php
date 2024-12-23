@@ -4,13 +4,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Profile</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Category Details</title>
+    <style>
+        .name {
+            font-family: 'Lobster', cursive;
+            font-size: 9rem;
+        }
+
+        .email {
+            font-family: 'Comfortaa', cursive;
+            font-size: 5rem;
+        }
+
+        body {
+            background-color: #4267B2;
+        }
+
+        /* Ensure input fields match original text appearance */
+        .input-field {
+            font-family: 'Lobster', cursive;
+            font-size: 9rem;
+            text-align: center;
+            color: white;
+            background: transparent;
+            border: 2px solid #ccc;
+            width: 100%;
+            padding: 1rem;
+        }
+
+        .email-input {
+            font-family: 'Comfortaa', cursive;
+            font-size: 5rem;
+        }
+
+        /* Hide input fields initially */
+        .editable {
+            display: none;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100">
-    <nav class="bg-white shadow">
+<body class="flex flex-col justify-center h-screen">
+    <nav class="fixed top-0 z-10 w-full bg-white shadow">
         <div class="container flex justify-between px-4 py-2 mx-auto">
             <a href="/" class="text-2xl font-bold">Laravel Exercises</a>
             <ul class="flex gap-4 items-center">
@@ -64,29 +100,75 @@
             </ul>
         </div>
     </nav>
-    <div class="container p-6 mx-auto">
-        <h1 class="mb-6 text-3xl font-bold text-center">Category Details</h1>
-        <a href="{{ route('categories.index') }}"
-            class="inline-block px-4 py-2 mb-6 font-bold text-white bg-gray-700 rounded hover:bg-gray-900">
-            ← Back
-        </a>
-        <div class="flex justify-center">
-            <div class="p-6 w-full max-w-sm bg-white rounded-lg shadow-lg">
-                <!-- Image -->
-                <div class="overflow-hidden w-full rounded-t-lg">
-                    <img src="{{ asset('images/' . $category['image']) }}"
-                        alt="{{ $category['name'] }}"
-                        class="w-full h-auto">
-                </div>
-                <!-- Card Content -->
-                <div class="p-4">
-                    <h2 class="mb-2 text-xl font-semibold">{{ $category['name'] }}</h2>
-                    <p class="text-gray-700">This is a brief description of the category. Add more details here if needed.</p>
-                </div>
+    <div class="container flex flex-col justify-center p-12 mx-auto mt-16 min-h-screen text-center">
+        <form action="{{ route('users.update', auth()->user()) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <!-- Display name and email text initially -->
+            <p id="name" class="text-white name">
+                {{ auth()->user()->name }}
+            </p>
+            <p id="email" class="text-white email">
+                {{ auth()->user()->email }}
+            </p>
+
+            <!-- Editable input fields for name and email (hidden initially) -->
+            <div id="name-edit" class="editable">
+                <input type="text" name="name" value="{{ auth()->user()->name }}" class="mb-4 input-field">
             </div>
-        </div>
+            <div id="email-edit" class="editable">
+                <input type="email" name="email" value="{{ auth()->user()->email }}" class="input-field email-input">
+            </div>
+
+            <div class="my-8"></div>
+
+            <!-- Edit button that toggles form visibility -->
+            <button id="editBtn" type="button"
+                onclick="toggleEdit()"
+                class="px-6 py-4 mt-12 text-2xl font-bold text-white bg-blue-500 rounded">
+                Edit
+            </button>
+
+            <!-- Save button (hidden initially) -->
+            <button id="saveBtn" type="submit"
+                class="hidden px-6 py-4 mt-12 text-2xl font-bold text-white bg-blue-500 rounded">
+                Save
+            </button>
+        </form>
     </div>
+
     <script>
+        // Function to toggle edit mode
+        function toggleEdit() {
+            const nameElement = document.getElementById('name');
+            const emailElement = document.getElementById('email');
+            const nameEdit = document.getElementById('name-edit');
+            const emailEdit = document.getElementById('email-edit');
+            const editBtn = document.getElementById('editBtn');
+            const saveBtn = document.getElementById('saveBtn');
+
+            // Check if we are in edit mode or view mode
+            const isEditing = nameEdit.style.display === 'block';
+
+            if (isEditing) {
+                // If in edit mode, switch back to view mode
+                nameElement.style.display = 'block';
+                emailElement.style.display = 'block';
+                nameEdit.style.display = 'none';
+                emailEdit.style.display = 'none';
+                editBtn.innerText = 'Edit';
+                saveBtn.classList.add('hidden');
+            } else {
+                // If in view mode, switch to edit mode
+                nameElement.style.display = 'none';
+                emailElement.style.display = 'none';
+                nameEdit.style.display = 'block';
+                emailEdit.style.display = 'block';
+                editBtn.innerText = 'Cancel';
+                saveBtn.classList.remove('hidden');
+            }
+        }
+
         function toggleDropdown(event) {
             const dropdownMenu = document.getElementById('dropdown-menu');
             dropdownMenu.classList.toggle('hidden');

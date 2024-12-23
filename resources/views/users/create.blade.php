@@ -4,13 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Create New User</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Category Details</title>
 </head>
 
-<body class="bg-gray-100">
-    <nav class="bg-white shadow">
+<body class="flex flex-col h-screen">
+    <nav class="fixed top-0 right-0 left-0 bg-white shadow">
         <div class="container flex justify-between px-4 py-2 mx-auto">
             <a href="/" class="text-2xl font-bold">Laravel Exercises</a>
             <ul class="flex gap-4 items-center">
@@ -49,7 +48,8 @@
                             </li>
                         </a>
                         <a href="{{ route('users.create') }}">
-                            <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100" role="menuitem">
+                            <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100"
+                                role="menuitem">
                                 + Create New User
                             </li>
                         </a>
@@ -64,28 +64,33 @@
             </ul>
         </div>
     </nav>
-    <div class="container p-6 mx-auto">
-        <h1 class="mb-6 text-3xl font-bold text-center">Category Details</h1>
-        <a href="{{ route('categories.index') }}"
-            class="inline-block px-4 py-2 mb-6 font-bold text-white bg-gray-700 rounded hover:bg-gray-900">
-            ← Back
-        </a>
-        <div class="flex justify-center">
-            <div class="p-6 w-full max-w-sm bg-white rounded-lg shadow-lg">
-                <!-- Image -->
-                <div class="overflow-hidden w-full rounded-t-lg">
-                    <img src="{{ asset('images/' . $category['image']) }}"
-                        alt="{{ $category['name'] }}"
-                        class="w-full h-auto">
-                </div>
-                <!-- Card Content -->
-                <div class="p-4">
-                    <h2 class="mb-2 text-xl font-semibold">{{ $category['name'] }}</h2>
-                    <p class="text-gray-700">This is a brief description of the category. Add more details here if needed.</p>
-                </div>
-            </div>
+    <div class="container flex justify-center items-center px-4 mx-auto min-h-screen sm:px-6 lg:px-8">
+        <div class="w-full max-w-sm">
+            <h1 class="mb-6 text-3xl font-semibold text-center text-gray-700">Create New User</h1>
+
+            <form action="{{ route('users.store') }}" method="POST" class="flex flex-col gap-6">
+                @csrf
+                @method('POST')
+                <input type="text" name="name" placeholder="Name"
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 input-field focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required>
+
+                <input type="email" name="email" placeholder="Email"
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 input-field focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required>
+
+                <input type="password" name="password" placeholder="Password"
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 input-field focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    required>
+
+                <button type="submit"
+                    class="px-4 py-2 w-full text-sm font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Create User
+                </button>
+            </form>
         </div>
     </div>
+
     <script>
         function toggleDropdown(event) {
             const dropdownMenu = document.getElementById('dropdown-menu');

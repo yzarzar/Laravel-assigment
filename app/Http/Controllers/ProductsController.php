@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Models\Categories;
 use App\Models\Products;
+use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Product\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
     private $productRepository;
+    private $categoriesRepository;
 
-    public function __construct(ProductRepositoryInterface $productRepository) {
+    public function __construct(ProductRepositoryInterface $productRepository, CategoryRepositoryInterface $categoriesRepository) {
+        $this->middleware('auth');
         $this->productRepository = $productRepository;
+        $this->categoriesRepository = $categoriesRepository;
     }
 
     public function index() {
@@ -21,7 +26,8 @@ class ProductsController extends Controller
     }
 
     public function create() {
-        return view('products.create');
+        $categories = $this->categoriesRepository->index();
+        return view('products.create', compact('categories'));
     }
 
     public function show($id) {
@@ -51,19 +57,12 @@ class ProductsController extends Controller
 
     public function edit($id) {
         $product = $this->productRepository->show($id);
-        return view('products.edit', compact('product'));
+        $categories = $this->categoriesRepository->index();
+        return view('products.edit', compact('product', 'categories'));
     }
 
     public function update(ProductRequest $request, $id) {
         $validatedData = $request->validated();
-
-        $product = $this->productRepository->show($id);
-        if (isset($product->image)) {
-            $imagePath = public_path('images/' . $product->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-        }
 
         $validatedData['status'] = $request->has('status');
 

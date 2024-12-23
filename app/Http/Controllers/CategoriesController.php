@@ -10,6 +10,7 @@ class CategoriesController extends Controller
     private $categoryRepository;
 
     public function __construct(CategoryRepositoryInterface $categoryRepository) {
+        $this->middleware('auth');
         $this->categoryRepository = $categoryRepository;
     }
 
@@ -52,14 +53,6 @@ class CategoriesController extends Controller
 
     public function update(CategoryRequest $request, $id) {
         $validatedData = $request->validated();
-
-        $category = $this->categoryRepository->show($id);
-        if (isset($category->image)) {
-            $imagePath = public_path('images/' . $category->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-        }
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
