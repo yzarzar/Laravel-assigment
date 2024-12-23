@@ -3,13 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
-use App\Models\Categories;
-use Illuminate\Http\Request;
+use App\Repositories\Category\CategoryRepositoryInterface;
 
 class CategoriesController extends Controller
 {
+    private $categoryRepository;
+
+    public function __construct(CategoryRepositoryInterface $categoryRepository) {
+        $this->categoryRepository = $categoryRepository;
+    }
+
     public function index() {
-        $categories = Categories::all();
+        $categories = $this->categoryRepository->index();
         return view('categories.index', compact('categories'));
     }
 
@@ -26,28 +31,35 @@ class CategoriesController extends Controller
             $validatedData = array_merge($validatedData, ['image' => $imageName]);
         }
 
-        Categories::create($validatedData);
+        $this->categoryRepository->store($validatedData);
         return redirect()->route('categories.index');
     }
 
     public function destroy($id) {
-        $category = Categories::find($id);
-        $category->delete();
+        $this->categoryRepository->delete($id);
         return redirect()->route('categories.index');
     }
 
     public function show($id) {
-        $category = Categories::find($id);
+        $category = $this->categoryRepository->show($id);
         return view('categories.show', compact('category'));
     }
 
     public function edit($id) {
-        $category = Categories::find($id);
+        $category = $this->categoryRepository->show($id);
         return view('categories.edit', compact('category'));
     }
 
     public function update(CategoryRequest $request, $id) {
         $validatedData = $request->validated();
+
+        $category = $this->categoryRepository->show($id);
+        if (isset($category->image)) {
+            $imagePath = public_path('images/' . $category->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -55,8 +67,7 @@ class CategoriesController extends Controller
             $validatedData = array_merge($validatedData, ['image' => $imageName]);
         }
 
-        $category = Categories::find($id);
-        $category->update($validatedData);
+        $this->categoryRepository->update($validatedData, $id);
         return redirect()->route('categories.index');
     }
 }
