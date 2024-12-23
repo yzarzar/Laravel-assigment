@@ -34,7 +34,15 @@
             </label>
             <label for="image" class="block mb-2 text-lg">
                 Image:
-                <input type="file" name="image" id="image" class="px-2 py-1 w-full rounded border border-gray-300">
+                <img src="{{ asset('images/' . $category->image) }}" alt="{{ $category->name }}" class="object-cover mb-4 w-48 h-48 rounded" id="image-preview">
+                <input type="file" name="image" id="image" class="px-2 py-1 w-full rounded border border-gray-300" onchange="
+                    const reader = new FileReader();
+                    reader.addEventListener('load', () => {
+                        const imagePreview = document.getElementById('image-preview');
+                        imagePreview.setAttribute('src', reader.result);
+                    });
+                    reader.readAsDataURL(this.files[0]);
+                ">
                 @error('image')
                     <p class="text-sm text-red-500">{{ $message }}</p>
                 @enderror
