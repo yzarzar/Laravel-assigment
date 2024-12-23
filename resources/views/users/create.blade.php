@@ -68,20 +68,33 @@
         <div class="w-full max-w-sm">
             <h1 class="mb-6 text-3xl font-semibold text-center text-gray-700">Create New User</h1>
 
-            <form action="{{ route('users.store') }}" method="POST" class="flex flex-col gap-6">
+            <form action="{{ route('users.store') }}" method="POST" class="flex flex-col gap-4">
                 @csrf
                 @method('POST')
                 <input type="text" name="name" placeholder="Name"
-                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 input-field focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required>
-
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    @error('name') is-invalid @enderror>
+                @error('name')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
                 <input type="email" name="email" placeholder="Email"
-                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 input-field focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required>
-
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    @error('email') is-invalid @enderror>
+                @error('email')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
                 <input type="password" name="password" placeholder="Password"
-                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 input-field focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required>
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    @error('password') is-invalid @enderror>
+                @error('password')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <input type="password" name="password_confirmation" placeholder="Confirm Password"
+                    class="px-4 py-2 text-gray-700 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    @error('password_confirmation') is-invalid @enderror>
+                @error('password_confirmation')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                @enderror
 
                 <button type="submit"
                     class="px-4 py-2 w-full text-sm font-bold text-white bg-blue-500 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
