@@ -78,6 +78,7 @@
                             class="object-cover w-full h-48 rounded">
                         <h2 class="text-2xl font-bold"><span>{{ $data['id'] }}. </span>{{ $data['name'] }}</h2>
                     </a>
+                    <span class="block mt-4">Category: <span class="font-bold">{{ $data['category']['name'] }}</span></span>
                     <p class="text-gray-600">{{ $data['description'] }}</p>
                     <p class="text-gray-600">price: ${{ $data['price'] }}</p>
                     <p class="text-gray-600">status: <span class="font-bold {{ $data['status'] ? 'text-green-500' : 'text-red-500' }}">{{ $data['status'] ? 'Active' : 'Inactive' }}</span></p>
