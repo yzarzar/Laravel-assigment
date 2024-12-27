@@ -52,10 +52,10 @@
                                                                 <img width="40" height="40" class="rounded-circle"
                                                                     src="{{ asset('images/' . $user->image) }}"
                                                                     alt="{{ $user->name }}'s profile"
-                                                                    style="object-fit: cover; border-radius: 50%;">
+                                                                    style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;">
                                                             @else
                                                                 <div class="text-white widget-heading bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                                                                    style="width: 40px; height: 40px;">
+                                                                    style="width: 40px; height: 40px; object-fit: cover;">
                                                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                                                 </div>
                                                             @endif
@@ -80,10 +80,6 @@
                                                     <i class="fa fa-eye"></i>
                                                 </a>
                                                 @if (auth()->user()->id !== $user->id)
-                                                    <a href="{{ route('users.edit', ['id' => $user->id]) }}"
-                                                        class="mr-2 btn btn-primary btn-sm" title="Edit">
-                                                        <i class="fa fa-edit"></i>
-                                                    </a>
                                                     <form action="{{ route('users.destroy', ['id' => $user->id]) }}"
                                                         method="POST" class="d-inline"
                                                         onsubmit="return confirm('Are you sure you want to delete this user?');">
