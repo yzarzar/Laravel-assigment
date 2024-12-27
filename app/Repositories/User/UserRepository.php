@@ -19,32 +19,12 @@ class UserRepository implements UserRepositoryInterface
 
     public function store(array $data)
     {
-        if (isset($data['image'])) {
-            $imageName = time() . '.' . $data['image']->extension();
-            $data['image']->move(public_path('images'), $imageName);
-            $data['image'] = $imageName;
-        }
-
         return User::create($data);
     }
 
     public function update(array $data, $id)
     {
         $user = User::findOrFail($id);
-
-        if (isset($data['image'])) {
-            if ($user->image) {
-                $oldImagePath = public_path('images/') . $user->image;
-                if (file_exists($oldImagePath)) {
-                    unlink($oldImagePath);
-                }
-            }
-
-            $imageName = time() . '.' . $data['image']->extension();
-            $data['image']->move(public_path('images'), $imageName);
-            $data['image'] = $imageName;
-        }
-
         $user->update($data);
         return $user;
     }
