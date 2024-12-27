@@ -21,10 +21,21 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $userId = $this->route('id');
+
+        $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $userId,
+            'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'address' => 'nullable|string|max:1000',
+            'phone' => 'nullable|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
         ];
+
+        // Only require password for new users
+        if (!$userId) {
+            $rules['password'] = 'required|string|min:8|confirmed';
+        }
+
+        return $rules;
     }
 }
