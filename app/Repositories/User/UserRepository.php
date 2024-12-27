@@ -3,44 +3,136 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
-use App\Repositories\User\UserRepositoryInterface;
+use Illuminate\Support\Facades\Storage;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function show($id)
+    public function index()
     {
-       $user = User::find($id);
-       return $user;
+        return User::latest()->paginate(5);
     }
 
-    public function update(array $data, $id)
+    public function show($id)
     {
-        $user = User::find($id);
-        $user->update($data);
-        return $user;
+        return User::findOrFail($id);
     }
 
     public function store(array $data)
     {
+        if (isset($data['image'])) {
+            $imageName = time() . '.' . $data['image']->extension();
+            $data['image']->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
         return User::create($data);
     }
 
-    public function index()
+    public function update(array $data, $id)
     {
-        return User::all();
+        $user = User::findOrFail($id);
+
+        if (isset($data['image'])) {
+            if ($user->image) {
+                $oldImagePath = public_path('images/') . $user->image;
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            $imageName = time() . '.' . $data['image']->extension();
+            $data['image']->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        $user->update($data);
+        return $user;
     }
 
     public function delete($id)
     {
-        $user = User::find($id);
-        $user->delete();
-        return $user;
+        $user = User::findOrFail($id);
+        if ($user->image) {
+            $imagePath = public_path('images/') . $user->image;
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        return $user->delete();
     }
 
     public function updateAnotherUser(array $data, $id)
     {
-        $user = User::find($id);
-        $user->update($data);
+        $user = User::findOrFail($id);
+
+        if (isset($data['image'])) {
+            if ($user->image) {
+                $oldImagePath = public_path('images/') . $user->image;
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            $imageName = time() . '.' . $data['image']->extension();
+            $data['image']->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        // Specific validation for another user
+        $updateData = [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'address' => $data['address'] ?? null,
+            'phone' => $data['phone'] ?? null
+        ];
+
+        if (isset($data['image'])) {
+            $updateData['image'] = $data['image'];
+        }
+
+        $user->update($updateData);
+        return $user;
+    }
+
+    public function getAdminProfile($id)
+    {
+        return User::where('id', $id)->firstOrFail();
+    }
+
+    public function updateAdminProfile(array $data, $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (isset($data['image'])) {
+            if ($user->image) {
+                $oldImagePath = public_path('images/') . $user->image;
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            $imageName = time() . '.' . $data['image']->extension();
+            $data['image']->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        // Specific validation for admin
+        $updateData = [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'address' => $data['address'] ?? null,
+            'phone' => $data['phone'] ?? null
+        ];
+
+        if (isset($data['image'])) {
+            $updateData['image'] = $data['image'];
+        }
+
+        if (!empty($data['password'])) {
+            $updateData['password'] = bcrypt($data['password']);
+        }
+
+        $user->update($updateData);
         return $user;
     }
 }

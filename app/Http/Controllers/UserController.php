@@ -23,13 +23,47 @@ class UserController extends Controller
 
     public function update(UserRequest $request, $id)
     {
-        $this->userRepository->update($request->all(), $id);
-        return redirect()->route('user.show', $id);
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+
+            // Delete old image if exists
+            $user = $this->userRepository->show($id);
+            if ($user->image && file_exists(public_path('images/' . $user->image))) {
+                unlink(public_path('images/' . $user->image));
+            }
+
+            // Store new image
+            $image->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        $user = $this->userRepository->update($data, $id);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'user' => $user
+            ]);
+        }
+
+        return redirect()->route('user.show', $id)->with('success', 'Profile updated successfully');
     }
 
     public function store(UserRequest $request)
     {
-        $this->userRepository->store($request->all());
+        $lastUser = $this->userRepository->store($request->all());
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images'), $imageName);
+            $this->userRepository->update(['image' => $imageName], $lastUser->id);
+        }
+
         return redirect()->route('users.index');
     }
 
@@ -50,9 +84,32 @@ class UserController extends Controller
         return redirect()->route('users.index');
     }
 
+    public function edit($id)
+    {
+        $user = $this->userRepository->show($id);
+        return view('users.edit', compact('user'));
+    }
+
     public function updateAnotherUser(UserRequest $request, $id)
     {
-        $this->userRepository->updateAnotherUser($request->all(), $id);
-        return redirect()->route('users.index', $id);
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+
+            // Delete old image if exists
+            $user = $this->userRepository->show($id);
+            if ($user->image && file_exists(public_path('images/' . $user->image))) {
+                unlink(public_path('images/' . $user->image));
+            }
+
+            // Store new image
+            $image->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        $this->userRepository->updateAnotherUser($data, $id);
+        return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 }

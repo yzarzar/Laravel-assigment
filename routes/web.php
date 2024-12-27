@@ -37,9 +37,12 @@ Route::group(['prefix' => 'users'], function () {
     Route::put('/{id}', [UserController::class, 'update'])->name('users.update');
     Route::post('/', [UserController::class, 'store'])->name('users.store');
     Route::get('/create', [UserController::class, 'create'])->name('users.create');
-    Route::get('/{id}', [UserController::class, 'show'])->name('user.show');
     Route::get('/', [UserController::class, 'index'])->name('users.index');
+    Route::get('/{id}', [UserController::class, 'show'])->name('user.show');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Edit routes for other users
+    Route::get('/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/{id}/update-another-user', [UserController::class, 'updateAnotherUser'])->name('users.update-another-user');
 });
 

@@ -1,99 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Product Details</title>
-</head>
-
-<body class="bg-gray-100">
-    <nav class="bg-white shadow">
-        <div class="container flex justify-between px-4 py-2 mx-auto">
-            <a href="/" class="text-2xl font-bold">Laravel Exercises</a>
-            <ul class="flex gap-4 items-center">
-                <li><a href="{{ route('categories.index') }}" class="hover:text-blue-500">Categories</a></li>
-                <li><a href="{{ route('products.index') }}" class="hover:text-blue-500">Products</a></li>
-                <li class="relative" id="user-menu">
-                    <button
-                        class="flex gap-2 items-center px-4 py-2 w-full text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-                        type="button" aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown(event)">
-                        <span
-                            class="inline-flex justify-center items-center w-8 h-8 text-base font-semibold text-white bg-gray-700 rounded-full">
-                            {{ substr(auth()->user()->name, 0, 1) }}
+@extends('layouts.master')
+@section('content')
+    <div class="app-main__inner">
+        <div class="app-page-title">
+            <div class="page-title-wrapper">
+                <div class="page-title-heading">
+                    <div class="page-title-icon">
+                        <i class="pe-7s-box2 icon-gradient bg-happy-itmeo"></i>
+                    </div>
+                    <div>Product Details
+                        <div class="page-title-subheading">
+                            View detailed information about this product
+                        </div>
+                    </div>
+                </div>
+                <div class="page-title-actions">
+                    <a href="{{ route('products.index') }}" class="btn-shadow btn btn-info">
+                        <span class="pr-2 btn-icon-wrapper opacity-7">
+                            <i class="fa fa-arrow-left fa-w-20"></i>
                         </span>
-                        <span class="ml-2">{{ auth()->user()->name }}</span>
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
-                        </svg>
-                    </button>
-                    <ul id="dropdown-menu" class="hidden absolute right-0 py-1 w-48 bg-white rounded-md shadow-lg"
-                        role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
-                        <a href="{{ route('user.show', ['id' => auth()->user()->id]) }}">
-                            <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                Profile
-                            </li>
-                        </a>
-                        <a href="#">
-                            <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                Settings
-                            </li>
-                        </a>
-                        <a href="{{ route('users.index') }}">
-                            <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                See All Users
-                            </li>
-                        </a>
-                        <a href="{{ route('users.create') }}">
-                            <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100" role="menuitem">
-                                + Create New User
-                            </li>
-                        </a>
-                        <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100" role="menuitem">
-                            <form action="{{ route('logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="w-full">Logout</button>
-                            </form>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                        Back to List
+                    </a>
+                </div>
+            </div>
         </div>
-    </nav>
-    <div class="container p-4 mx-auto">
-        <h1 class="mb-4 text-3xl font-bold">Product Details</h1>
-        <a href="{{ route('products.index') }}" class="inline-block px-4 py-2 mb-4 text-white bg-gray-700 rounded hover:bg-gray-900"><- Back</a>
-        <div class="flex justify-center items-center">
-            <div class="p-4 bg-white rounded shadow">
-                <h2 class="text-2xl font-bold">{{ $product['id'] }}. {{ $product['name'] }}</h2>
-                <img src="{{ asset('images/' . $product['image']) }}" alt="{{ $product['name'] }}"
-                    class="object-cover mx-auto w-48 h-48 rounded">
-                <p class="mt-4">{{ $product['description'] }}</p>
-                <span class="block mt-4">Category: <span class="font-bold">{{ $product['category']['name'] }}</span></span>
-                <span class="block mt-4">price: ${{ $product['price'] }}</span>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="mb-3 main-card card">
+                    <div class="card-header">Product Information</div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="position-relative">
+                                    <img src="{{ asset('images/' . $product['image']) }}"
+                                        alt="{{ $product['name'] }}"
+                                        class="w-100 rounded shadow-sm">
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="position-relative">
+                                    <h4 class="mb-3">Product Details</h4>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <th class="bg-light" style="width: 200px;">Name</th>
+                                            <td>{{ $product['name'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Category</th>
+                                            <td>{{ $product['category']['name'] }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Price</th>
+                                            <td>${{ number_format($product['price'], 2) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Description</th>
+                                            <td>{{ $product['description'] ?? 'No description available' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Created At</th>
+                                            <td>{{ $product['created_at'] ? date('F j, Y, g:i a', strtotime($product['created_at'])) : 'N/A' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">Updated At</th>
+                                            <td>{{ $product['updated_at'] ? date('F j, Y, g:i a', strtotime($product['updated_at'])) : 'N/A' }}</td>
+                                        </tr>
+                                    </table>
+                                    
+                                    <div class="mt-4">
+                                        <a href="{{ route('products.edit', $product['id']) }}" class="btn btn-primary">
+                                            <i class="fa fa-edit"></i> Edit Product
+                                        </a>
+                                        <form action="{{ route('products.destroy', $product['id']) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">
+                                                <i class="fa fa-trash"></i> Delete Product
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <script>
-        function toggleDropdown(event) {
-            const dropdownMenu = document.getElementById('dropdown-menu');
-            dropdownMenu.classList.toggle('hidden');
-        }
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', function(event) {
-            const userMenu = document.getElementById('user-menu');
-            const dropdownMenu = document.getElementById('dropdown-menu');
-
-            if (!userMenu.contains(event.target)) {
-                dropdownMenu.classList.add('hidden');
-            }
-        });
-    </script>
-</body>
-
-</html>
+@endsection
