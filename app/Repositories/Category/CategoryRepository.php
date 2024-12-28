@@ -34,8 +34,27 @@ class CategoryRepository implements CategoryRepositoryInterface {
         return $category;
     }
 
+    // public function delete($id) {
+    //     $category = Categories::find($id);
+
+    //     if (isset($category->image)) {
+    //         $imagePath = public_path('images/' . $category->image);
+    //         if (file_exists($imagePath)) {
+    //             unlink($imagePath);
+    //         }
+    //     }
+
+    //     $category->delete();
+    //     return $category;
+    // }
+
     public function delete($id) {
         $category = Categories::find($id);
+
+        if ($category->products()->count() > 0) {
+            echo "error";
+            dd($category->products()->count());
+        }
 
         if (isset($category->image)) {
             $imagePath = public_path('images/' . $category->image);
@@ -45,6 +64,10 @@ class CategoryRepository implements CategoryRepositoryInterface {
         }
 
         $category->delete();
-        return $category;
+        return [
+            'success' => true,
+            'message' => 'Category deleted successfully',
+            'data' => $category
+        ];
     }
 }

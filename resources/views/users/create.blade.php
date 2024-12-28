@@ -5,7 +5,7 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-user icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-user-plus icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>Create New User
                         <div class="page-title-subheading">
@@ -88,6 +88,21 @@
                                         <input type="password" id="password_confirmation" name="password_confirmation"
                                             class="form-control @error('password_confirmation') is-invalid @enderror" required>
                                         @error('password_confirmation')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+
+                                    <div class="position-relative form-group">
+                                        <label for="role" class="form-label">Role</label>
+                                        <select id="role" name="role" class="form-control @error('role') is-invalid @enderror">
+                                            <option value="">Select Role</option>
+                                            @foreach($roles as $role)
+                                                <option value="{{ $role->name }}" {{ old('role') == $role->name ? 'selected' : '' }}>
+                                                    {{ ucfirst($role->name) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('role')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>

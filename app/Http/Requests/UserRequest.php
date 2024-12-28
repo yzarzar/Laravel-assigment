@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class UserRequest extends FormRequest
 {
@@ -22,6 +24,7 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         $userId = $this->route('id');
+        $roles = Role::pluck('name')->toArray();
 
         $rules = [
             'name' => 'required|string|max:255',
@@ -29,6 +32,7 @@ class UserRequest extends FormRequest
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
+            'role' => ['nullable', Rule::in($roles)],
         ];
 
         // Only require password for new users

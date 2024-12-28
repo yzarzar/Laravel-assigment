@@ -5,7 +5,7 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-user icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-user icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>User Profile
                         <div class="page-title-subheading">
@@ -25,21 +25,30 @@
         </div>
         <div class="row">
             <div class="col-md-12">
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                @endif
+
                 <div class="mb-3 main-card card">
                     <div class="card-header">Profile Information</div>
                     <div class="card-body">
-                        <form action="{{ route('users.update', $user->id) }}" method="POST" id="profile-form" enctype="multipart/form-data">
+                        <form action="{{ route('users.update', $user->id) }}" method="POST" id="profile-form"
+                            enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="text-center position-relative">
                                         <div class="mb-3 avatar-circle">
-                                            @if($user->image)
-                                                <img src="{{ asset('images/' . $user->image) }}"
-                                                     alt="Profile Image"
-                                                     class="img-fluid rounded-circle"
-                                                     style="width: 150px; height: 150px; object-fit: cover;">
+                                            @if ($user->image)
+                                                <img src="{{ asset('images/' . $user->image) }}" alt="Profile Image"
+                                                    class="img-fluid rounded-circle"
+                                                    style="width: 150px; height: 150px; object-fit: cover;">
                                             @else
                                                 <span class="display-4 font-weight-bold text-primary">
                                                     {{ substr($user->name, 0, 1) }}
@@ -51,8 +60,7 @@
                                                 <label for="image" class="form-label">Update Profile Image</label>
                                                 <input type="file" id="image" name="image"
                                                     class="form-control @error('image') is-invalid @enderror"
-                                                    accept="image/*"
-                                                    onchange="previewImage(this)">
+                                                    accept="image/*" onchange="previewImage(this)">
                                                 @error('image')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -82,12 +90,27 @@
                                                     <td id="phone-display">{{ $user->phone ?? 'Not provided' }}</td>
                                                 </tr>
                                                 <tr>
+                                                    <th class="bg-light">Role</th>
+                                                    <td id="role-display">
+                                                        @if ($user->roles->count() > 0)
+                                                            @foreach ($user->roles as $role)
+                                                                <span
+                                                                    class="badge badge-info">{{ ucfirst($role->name) }}</span>
+                                                            @endforeach
+                                                        @else
+                                                            No role assigned
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                                <tr>
                                                     <th class="bg-light">Created At</th>
-                                                    <td>{{ $user->created_at ? date('F j, Y, g:i a', strtotime($user->created_at)) : 'N/A' }}</td>
+                                                    <td>{{ $user->created_at ? date('F j, Y, g:i a', strtotime($user->created_at)) : 'N/A' }}
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <th class="bg-light">Updated At</th>
-                                                    <td>{{ $user->updated_at ? date('F j, Y, g:i a', strtotime($user->updated_at)) : 'N/A' }}</td>
+                                                    <td>{{ $user->updated_at ? date('F j, Y, g:i a', strtotime($user->updated_at)) : 'N/A' }}
+                                                    </td>
                                                 </tr>
                                             </table>
                                         </div>
@@ -133,16 +156,38 @@
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </div>
+
+                                            <div class="position-relative form-group">
+                                                <label for="role" class="form-label">Role</label>
+                                                <select id="role" name="role"
+                                                    class="form-control @error('role') is-invalid @enderror">
+                                                    <option value="">Select Role</option>
+                                                    @foreach (\Spatie\Permission\Models\Role::all() as $role)
+                                                        <option value="{{ $role->name }}"
+                                                            {{ old('role') == $role->name || $user->hasRole($role->name) ? 'selected' : '' }}>
+                                                            {{ ucfirst($role->name) }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('role')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
 
                                         <div class="mt-4">
-                                            <button type="button" id="editBtn" class="btn btn-primary" onclick="toggleEdit()">
-                                                <i class="fa fa-edit"></i> Edit Profile
-                                            </button>
-                                            <button type="submit" id="saveBtn" class="btn btn-success" style="display: none;">
-                                                <i class="fa fa-save"></i> Save Changes
-                                            </button>
-                                            <button type="button" id="cancelBtn" class="btn btn-secondary" style="display: none;" onclick="toggleEdit()">
+                                            @can('user-edit')
+                                                <button type="button" id="editBtn" class="btn btn-primary"
+                                                    onclick="toggleEdit()">
+                                                    <i class="fa fa-edit"></i> Edit Profile
+                                                </button>
+                                                <button type="submit" id="saveBtn" class="btn btn-success"
+                                                    style="display: none;">
+                                                    <i class="fa fa-save"></i> Save Changes
+                                                </button>
+                                            @endcan
+                                            <button type="button" id="cancelBtn" class="btn btn-secondary"
+                                                style="display: none;" onclick="toggleEdit()">
                                                 <i class="fa fa-times"></i> Cancel
                                             </button>
                                         </div>

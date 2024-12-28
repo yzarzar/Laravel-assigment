@@ -5,7 +5,7 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-box2 icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-box-open icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>Add New Product
                         <div class="page-title-subheading">

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
+use App\Models\Categories;
 use App\Repositories\Category\CategoryRepositoryInterface;
+use App\Models\Category;
 
 class CategoriesController extends Controller
 {
@@ -36,9 +38,26 @@ class CategoriesController extends Controller
         return redirect()->route('categories.index');
     }
 
-    public function destroy($id) {
-        $this->categoryRepository->delete($id);
-        return redirect()->route('categories.index');
+    public function destroy($id)
+    {
+        $category = Categories::findOrFail($id);
+        $productsCount = $category->products()->count();
+
+        if ($productsCount > 0) {
+            $products = $category->products;
+            return view('categories.confirm-delete', compact('category', 'products'));
+        }
+
+        $category->delete();
+        return redirect()->route('categories.index')->with('success', 'Category deleted successfully');
+    }
+
+    public function forceDelete($id)
+    {
+        $category = Categories::findOrFail($id);
+        $category->products()->delete(); // Delete associated products
+        $category->delete();
+        return redirect()->route('categories.index')->with('success', 'Category and its products deleted successfully');
     }
 
     public function show($id) {

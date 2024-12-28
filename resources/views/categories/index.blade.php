@@ -5,7 +5,7 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-drawer icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-tags icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>Categories
                         <div class="page-title-subheading">
@@ -13,14 +13,16 @@
                         </div>
                     </div>
                 </div>
-                <div class="page-title-actions">
-                    <a href="{{ route('categories.create') }}" class="btn-shadow btn btn-info">
-                        <span class="pr-2 btn-icon-wrapper opacity-7">
-                            <i class="fa fa-plus fa-w-20"></i>
-                        </span>
-                        Add New Category
-                    </a>
-                </div>
+                @can('category-create')
+                    <div class="page-title-actions">
+                        <a href="{{ route('categories.create') }}" class="btn-shadow btn btn-info">
+                            <span class="pr-2 btn-icon-wrapper opacity-7">
+                                <i class="fa fa-plus fa-w-20"></i>
+                            </span>
+                            Add New Category
+                        </a>
+                    </div>
+                @endcan
             </div>
         </div>
         <div class="row">
@@ -40,7 +42,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($categories as $category)
+                                @foreach ($categories as $category)
                                     <tr>
                                         <td class="text-center text-muted">{{ $loop->iteration }}</td>
                                         <td>
@@ -53,16 +55,27 @@
                                             </div>
                                         </td>
                                         <td class="text-center">
-                                            <img src="{{ asset('images/' . $category->image) }}" style="width: 50px; height: 50px; object-fit: cover;">
+                                            <img src="{{ asset('images/' . $category->image) }}"
+                                                style="width: 50px; height: 50px; object-fit: cover;">
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('categories.show', $category->id) }}" class="btn btn-primary btn-sm">Details</a>
-                                            <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST" class="d-inline">
+                                            @can('category-view')
+                                                <a href="{{ route('categories.show', $category->id) }}"
+                                                    class="btn btn-primary btn-sm">Details</a>
+                                            @endcan
+                                            @can('category-edit')
+                                                <a href="{{ route('categories.edit', $category->id) }}"
+                                                    class="btn btn-primary btn-sm">Edit</a>
+                                            @endcan
+                                            <form action="{{ route('categories.destroy', $category->id) }}" method="POST"
+                                                class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')">Delete</button>
+                                                @can('category-delete')
+                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                @endcan
                                             </form>
+
                                         </td>
                                     </tr>
                                 @endforeach

@@ -1,12 +1,11 @@
 @extends('layouts.master')
-
 @section('content')
     <div class="app-main__inner">
         <div class="app-page-title">
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-users icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-users icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>User Management
                         <div class="page-title-subheading">
@@ -15,12 +14,14 @@
                     </div>
                 </div>
                 <div class="page-title-actions">
-                    <a href="{{ route('users.create') }}" class="btn-shadow btn btn-info">
-                        <span class="pr-2 btn-icon-wrapper opacity-7">
-                            <i class="fa fa-plus fa-w-20"></i>
-                        </span>
-                        Create New User
-                    </a>
+                    @can('user-create')
+                        <a href="{{ route('users.create') }}" class="btn-shadow btn btn-info">
+                            <span class="pr-2 btn-icon-wrapper opacity-7">
+                                <i class="fa fa-plus fa-w-20"></i>
+                            </span>
+                            Create New User
+                        </a>
+                    @endcan
                 </div>
             </div>
         </div>
@@ -36,6 +37,7 @@
                                     <th class="text-center">#</th>
                                     <th>Name</th>
                                     <th class="text-center">Email</th>
+                                    <th class="text-center">Role</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -74,6 +76,15 @@
                                         </td>
                                         <td class="text-center">{{ $user->email }}</td>
                                         <td class="text-center">
+                                            @if ($user->roles->count() > 0)
+                                                @foreach ($user->roles as $role)
+                                                    <span class="badge badge-primary">{{ ucfirst($role->name) }}</span>
+                                                @endforeach
+                                            @else
+                                                <span class="badge badge-secondary">No role</span>
+                                            @endif
+                                        </td>
+                                        <td class="text-center">
                                             <div class="d-flex justify-content-center">
                                                 <a href="{{ route('user.show', ['id' => $user->id]) }}"
                                                     class="mr-2 btn btn-info btn-sm" title="View">
@@ -85,9 +96,11 @@
                                                         onsubmit="return confirm('Are you sure you want to delete this user?');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger btn-sm" title="Delete">
-                                                            <i class="fa fa-trash"></i>
-                                                        </button>
+                                                        @can('user-delete')
+                                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        @endcan
                                                     </form>
                                                 @endif
                                             </div>
