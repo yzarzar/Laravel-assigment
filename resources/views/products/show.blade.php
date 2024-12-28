@@ -5,7 +5,7 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-box2 icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-box icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>Product Details
                         <div class="page-title-subheading">
@@ -31,9 +31,8 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="position-relative">
-                                    <img src="{{ asset('images/' . $product['image']) }}"
-                                        alt="{{ $product['name'] }}"
-                                        class="w-100 rounded shadow-sm">
+                                    <img src="{{ asset('images/' . $product['image']) }}" alt="{{ $product['name'] }}"
+                                        class="rounded shadow-sm w-100">
                                 </div>
                             </div>
                             <div class="col-md-8">
@@ -58,24 +57,32 @@
                                         </tr>
                                         <tr>
                                             <th class="bg-light">Created At</th>
-                                            <td>{{ $product['created_at'] ? date('F j, Y, g:i a', strtotime($product['created_at'])) : 'N/A' }}</td>
+                                            <td>{{ $product['created_at'] ? date('F j, Y, g:i a', strtotime($product['created_at'])) : 'N/A' }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th class="bg-light">Updated At</th>
-                                            <td>{{ $product['updated_at'] ? date('F j, Y, g:i a', strtotime($product['updated_at'])) : 'N/A' }}</td>
+                                            <td>{{ $product['updated_at'] ? date('F j, Y, g:i a', strtotime($product['updated_at'])) : 'N/A' }}
+                                            </td>
                                         </tr>
                                     </table>
-                                    
+
                                     <div class="mt-4">
-                                        <a href="{{ route('products.edit', $product['id']) }}" class="btn btn-primary">
-                                            <i class="fa fa-edit"></i> Edit Product
-                                        </a>
-                                        <form action="{{ route('products.destroy', $product['id']) }}" method="POST" class="d-inline">
+                                        @can('product-edit')
+                                            <a href="{{ route('products.edit', $product['id']) }}" class="btn btn-primary">
+                                                <i class="fa fa-edit"></i> Edit Product
+                                            </a>
+                                        @endcan
+                                        <form action="{{ route('products.destroy', $product['id']) }}" method="POST"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this product?')">
-                                                <i class="fa fa-trash"></i> Delete Product
-                                            </button>
+                                            @can('product-delete')
+                                                <button type="submit" class="btn btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this product?')">
+                                                    <i class="fa fa-trash"></i> Delete Product
+                                                </button>
+                                            @endcan
                                         </form>
                                     </div>
                                 </div>

@@ -86,46 +86,56 @@
                             <div class="relative" id="user-menu">
                                 <button
                                     class="flex gap-2 items-center px-4 py-2 w-full text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-                                    type="button" aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown(event)">
-                                    @if(auth()->user()->image)
-                                        <img src="{{ asset('images/' . auth()->user()->image) }}"
-                                             alt="Profile Image"
-                                             class="inline-flex justify-center items-center w-8 h-8 rounded-full object-cover">
+                                    type="button" aria-expanded="false" aria-haspopup="true"
+                                    onclick="toggleDropdown(event)">
+                                    @if (auth()->user()->image)
+                                        <img src="{{ asset('images/' . auth()->user()->image) }}" alt="Profile Image"
+                                            class="inline-flex object-cover justify-center items-center w-8 h-8 rounded-full">
                                     @else
-                                        <span class="inline-flex justify-center items-center w-8 h-8 text-base font-semibold text-white bg-gray-700 rounded-full">
+                                        <span
+                                            class="inline-flex justify-center items-center w-8 h-8 text-base font-semibold text-white bg-gray-700 rounded-full">
                                             {{ substr(auth()->user()->name, 0, 1) }}
                                         </span>
                                     @endif
                                     <span class="ml-2">{{ auth()->user()->name }}</span>
                                     <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                                         xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 9l-7 7-7-7">
                                         </path>
                                     </svg>
                                 </button>
-                                <ul id="dropdown-menu" class="hidden absolute right-0 py-1 w-48 bg-white rounded-md shadow-lg"
+                                <ul id="dropdown-menu"
+                                    class="hidden absolute right-0 py-1 w-48 bg-white rounded-md shadow-lg"
                                     role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
                                     <a href="{{ route('user.show', ['id' => auth()->user()->id]) }}">
-                                        <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                        <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            role="menuitem">
                                             Profile
                                         </li>
                                     </a>
                                     <a href="#">
-                                        <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                        <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            role="menuitem">
                                             Settings
                                         </li>
                                     </a>
-                                    <a href="{{ route('users.index') }}">
-                                        <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                            See All Users
-                                        </li>
-                                    </a>
-                                    <a href="{{ route('users.create') }}">
-                                        <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100" role="menuitem">
-                                            + Create New User
-                                        </li>
-                                    </a>
-                                    <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100" role="menuitem">
+                                    @can('hasPermissionOnlyAdmin')
+                                        <a href="{{ route('users.index') }}">
+                                            <li class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                role="menuitem">
+                                                See All Users
+                                            </li>
+                                        </a>
+                                        <a href="{{ route('users.create') }}">
+                                            <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100"
+                                                role="menuitem">
+                                                + Create New User
+                                            </li>
+                                        </a>
+                                    @endcan
+                                    <li class="block px-4 py-2 text-sm text-gray-700 border-t hover:bg-gray-100"
+                                        role="menuitem">
                                         <form action="{{ route('logout') }}" method="POST">
                                             @csrf
                                             <button type="submit" class="w-full">Logout</button>

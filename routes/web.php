@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ProductsController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -28,8 +29,19 @@ Route::group(['prefix' => 'categories'], function () {
     Route::post('/', [CategoriesController::class, 'store'])->name('categories.store');
     Route::get('/{id}', [CategoriesController::class, 'show'])->name('categories.show');
     Route::delete('/{id}', [CategoriesController::class, 'destroy'])->name('categories.destroy');
+    Route::delete('/{id}/force', [CategoriesController::class, 'forceDelete'])->name('categories.force-delete');
     Route::get('/{id}/edit', [CategoriesController::class, 'edit'])->name('categories.edit');
     Route::post('/{id}', [CategoriesController::class, 'update'])->name('categories.update');
+});
+
+// Roles
+Route::group(['prefix' => 'roles', 'middleware' => ['auth', 'role:admin']], function () {
+    Route::get('/', [RoleController::class, 'index'])->name('roles.index');
+    Route::get('/create', [RoleController::class, 'create'])->name('roles.create');
+    Route::post('/', [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+    Route::put('/{role}', [RoleController::class, 'update'])->name('roles.update');
+    Route::delete('/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
 });
 
 // Users
@@ -40,10 +52,6 @@ Route::group(['prefix' => 'users'], function () {
     Route::get('/', [UserController::class, 'index'])->name('users.index');
     Route::get('/{id}', [UserController::class, 'show'])->name('user.show');
     Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-
-    // Edit routes for other users
-    Route::get('/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('/{id}/update-another-user', [UserController::class, 'updateAnotherUser'])->name('users.update-another-user');
 });
 
 Auth::routes([

@@ -5,7 +5,7 @@
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="pe-7s-drawer icon-gradient bg-happy-itmeo"></i>
+                        <i class="fas fa-tag icon-gradient bg-mean-fruit"></i>
                     </div>
                     <div>Category Details
                         <div class="page-title-subheading">
@@ -31,9 +31,8 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="position-relative">
-                                    <img src="{{ asset('images/' . $category['image']) }}"
-                                        alt="{{ $category['name'] }}"
-                                        class="w-100 rounded shadow-sm">
+                                    <img src="{{ asset('images/' . $category['image']) }}" alt="{{ $category['name'] }}"
+                                        class="rounded shadow-sm w-100">
                                 </div>
                             </div>
                             <div class="col-md-8">
@@ -50,24 +49,32 @@
                                         </tr>
                                         <tr>
                                             <th class="bg-light">Created At</th>
-                                            <td>{{ $category['created_at'] ? date('F j, Y, g:i a', strtotime($category['created_at'])) : 'N/A' }}</td>
+                                            <td>{{ $category['created_at'] ? date('F j, Y, g:i a', strtotime($category['created_at'])) : 'N/A' }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <th class="bg-light">Updated At</th>
-                                            <td>{{ $category['updated_at'] ? date('F j, Y, g:i a', strtotime($category['updated_at'])) : 'N/A' }}</td>
+                                            <td>{{ $category['updated_at'] ? date('F j, Y, g:i a', strtotime($category['updated_at'])) : 'N/A' }}
+                                            </td>
                                         </tr>
                                     </table>
-                                    
+
                                     <div class="mt-4">
-                                        <a href="{{ route('categories.edit', $category['id']) }}" class="btn btn-primary">
-                                            <i class="fa fa-edit"></i> Edit Category
-                                        </a>
-                                        <form action="{{ route('categories.destroy', $category['id']) }}" method="POST" class="d-inline">
+                                        @can('category-edit')
+                                            <a href="{{ route('categories.edit', $category['id']) }}" class="btn btn-primary">
+                                                <i class="fa fa-edit"></i> Edit Category
+                                            </a>
+                                        @endcan
+                                        <form action="{{ route('categories.destroy', $category['id']) }}" method="POST"
+                                            class="d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this category?')">
-                                                <i class="fa fa-trash"></i> Delete Category
-                                            </button>
+                                            @can('category-delete')
+                                                <button type="submit" class="btn btn-danger"
+                                                    onclick="return confirm('Are you sure you want to delete this category?')">
+                                                    <i class="fa fa-trash"></i> Delete Category
+                                                </button>
+                                            @endcan
                                         </form>
                                     </div>
                                 </div>

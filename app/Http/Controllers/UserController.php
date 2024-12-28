@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-use App\Models\User;
 use App\Repositories\User\UserRepositoryInterface;
-use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -20,6 +19,40 @@ class UserController extends Controller
     {
         $user = $this->userRepository->show($id);
         return view('users.show', compact('user'));
+    }
+
+    public function create()
+    {
+        $roles = Role::all();
+        return view('users.create', compact('roles'));
+    }
+
+    public function edit($id)
+    {
+        $user = $this->userRepository->show($id);
+        $roles = Role::all();
+        return view('users.edit', compact('user', 'roles'));
+    }
+
+    public function store(UserRequest $request)
+    {
+        $data = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images'), $imageName);
+            $data['image'] = $imageName;
+        }
+
+        $user = $this->userRepository->store($data);
+        
+        // Assign role if selected
+        if ($request->has('role')) {
+            $user->assignRole($request->role);
+        }
+
+        return redirect()->route('users.index')->with('success', 'User created successfully');
     }
 
     public function update(UserRequest $request, $id)
@@ -41,27 +74,13 @@ class UserController extends Controller
         }
 
         $this->userRepository->update($data, $id);
-        return redirect()->route('users.index')->with('success', 'User updated successfully');
-    }
-
-    public function store(UserRequest $request)
-    {
-        $data = $request->validated();
         
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images'), $imageName);
-            $data['image'] = $imageName;
+        // Update role if selected
+        if ($request->has('role')) {
+            $user->syncRoles([$request->role]);
         }
 
-        $this->userRepository->store($data);
-        return redirect()->route('users.index')->with('success', 'User created successfully');
-    }
-
-    public function create()
-    {
-        return view('users.create');
+        return redirect()->route('user.show', ['id' => $id])->with('success', 'User updated successfully');
     }
 
     public function index()
@@ -74,64 +93,5 @@ class UserController extends Controller
     {
         $this->userRepository->delete($id);
         return redirect()->route('users.index');
-    }
-
-    public function edit($id)
-    {
-        $user = $this->userRepository->show($id);
-        return view('users.edit', compact('user'));
-    }
-
-    // public function updateAnotherUser(UserRequest $request, $id)
-    // {
-    //     $data = $request->validated();
-
-    //     if ($request->hasFile('image')) {
-    //         $image = $request->file('image');
-    //         $imageName = time() . '_' . $image->getClientOriginalName();
-
-    //         // Delete old image if exists
-    //         $user = $this->userRepository->show($id);
-    //         if ($user->image && file_exists(public_path('images/' . $user->image))) {
-    //             unlink(public_path('images/' . $user->image));
-    //         }
-
-    //         // Store new image
-    //         $image->move(public_path('images'), $imageName);
-    //         $data['image'] = $imageName;
-    //     }
-
-    //     $this->userRepository->updateAnotherUser($data, $id);
-    //     return redirect()->route('users.index')->with('success', 'User updated successfully');
-    // }
-
-    public function updateAnotherUser(UserRequest $request, $id)
-    {
-        $data = $request->validated();
-
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-
-            // Ensure directory exists
-            if (!file_exists(public_path('images'))) {
-                mkdir(public_path('images'), 0755, true);
-            }
-
-            // Delete old image if it exists
-            $user = User::findOrFail($id);
-            if ($user->image && file_exists(public_path('images/' . $user->image))) {
-                unlink(public_path('images/' . $user->image));
-            }
-
-            // Save new image
-            $image->move(public_path('images'), $imageName);
-            $data['image'] = $imageName;
-        }
-
-        // Update user
-        User::findOrFail($id)->update($data);
-
-        return redirect()->route('users.index')->with('success', 'User updated successfully');
     }
 }
