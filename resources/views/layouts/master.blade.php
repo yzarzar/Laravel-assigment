@@ -14,6 +14,36 @@
     <link href="https://demo.dashboardpack.com/architectui-html-free/main.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .app-wrapper-footer {
+            margin-top: auto;
+        }
+        .app-footer {
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        .app-footer__inner {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .app-footer-left, .app-footer-center, .app-footer-right {
+            color: #6c757d;
+        }
+        .app-footer-center i {
+            margin: 0 0.5rem;
+            color: #3f6ad8;
+        }
+        .app-footer i.fa-heart {
+            animation: heartbeat 1.5s infinite;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
 </head>
 
 <body>
@@ -359,7 +389,7 @@
                         <h3 class="themeoptions-heading">
                             <div>Main Content Options</div>
                             <button type="button"
-                                class="ml-auto btn-pill btn-shadow btn-wide active btn btn-focus btn-sm">Restore
+                                class="ml-auto btn-pill btn-shadow btn-wide btn btn-focus btn-sm">Restore
                                 Default
                             </button>
                         </h3>
@@ -393,45 +423,35 @@
             @include('layouts.sidebar')
             <div class="app-main__outer">
                 @yield('content')
+                <div class="app-wrapper-footer">
+                    <div class="app-footer">
+                        <div class="app-footer__inner">
+                            <div class="app-footer-left">
+                                <span class="pl-2">
+                                    Made with <i class="fas fa-heart text-danger"></i> by {{ auth()->user()->name }}
+                                </span>
+                            </div>
+                            <div class="app-footer-center">
+                                <span>
+                                    <i class="fas fa-code"></i> Laravel v{{ app()->version() }} |
+                                    <i class="fas fa-calendar"></i> {{ date('M d, Y') }} |
+                                    <i class="fas fa-clock"></i> {{ date('h:i A') }}
+                                </span>
+                            </div>
+                            <div class="app-footer-right">
+                                <span>
+                                    &copy; {{ date('Y') }} Laravel E-commerce
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <script type="text/javascript" src="https://demo.dashboardpack.com/architectui-html-free/assets/scripts/main.js">
-    </script>
-    <script>
-        function toggleDropdown(event) {
-            const dropdownMenu = document.getElementById('dropdown-menu');
-            dropdownMenu.classList.toggle('hidden');
-        }
 
-        // Close dropdown when clicking outside
-        window.addEventListener('click', function(event) {
-            const userMenu = document.getElementById('user-menu');
-            const dropdownMenu = document.getElementById('dropdown-menu');
-
-            if (!userMenu.contains(event.target)) {
-                dropdownMenu.classList.add('hidden');
-            }
-        });
-
-        function handleImagePreview(input) {
-            const preview = document.getElementById('imagePreview');
-
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                }
-
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                preview.src = '';
-                preview.style.display = 'none';
-            }
-        }
-    </script>
+    <script type="text/javascript" src="https://demo.dashboardpack.com/architectui-html-free/assets/scripts/main.js"></script>
+    @stack('scripts')
 </body>
 
 </html>
