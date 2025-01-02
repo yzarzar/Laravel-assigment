@@ -9,6 +9,8 @@ use App\Repositories\Category\CategoryRepository;
 use App\Repositories\User\UserRepositoryInterface;
 use App\Repositories\Product\ProductRepositoryInterface;
 use App\Repositories\Category\CategoryRepositoryInterface;
+use App\Repositories\Role\RoleRepository;
+use App\Repositories\Role\RoleRepositoryInterface;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -28,5 +30,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->bind(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(RoleRepositoryInterface::class, RoleRepository::class);
     }
 }

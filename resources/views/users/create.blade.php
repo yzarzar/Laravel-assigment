@@ -31,7 +31,7 @@
                         <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('POST')
-                            
+
                             <div class="row">
                                 <div class="col-md-8">
                                     <div class="position-relative form-group">
@@ -125,7 +125,7 @@
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                         <div class="mt-2">Preview:</div>
-                                        <img src="" id="image-preview" class="mt-2 w-100 rounded shadow-sm" 
+                                        <img src="" id="image-preview" class="mt-2 rounded shadow-sm w-100"
                                             style="display: none;" alt="Profile image preview">
                                     </div>
                                 </div>

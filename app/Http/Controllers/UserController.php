@@ -12,6 +12,7 @@ class UserController extends Controller
 
     public function __construct(UserRepositoryInterface $userRepository)
     {
+        $this->middleware('auth');
         $this->userRepository = $userRepository;
     }
 
@@ -46,7 +47,7 @@ class UserController extends Controller
         }
 
         $user = $this->userRepository->store($data);
-        
+
         // Assign role if selected
         if ($request->has('role')) {
             $user->assignRole($request->role);
@@ -74,7 +75,7 @@ class UserController extends Controller
         }
 
         $this->userRepository->update($data, $id);
-        
+
         // Update role if selected
         if ($request->has('role')) {
             $user->syncRoles([$request->role]);
