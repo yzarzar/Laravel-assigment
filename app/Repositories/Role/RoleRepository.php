@@ -21,9 +21,4 @@ class RoleRepository implements RoleRepositoryInterface
     {
         return Role::create($data);
     }
-
-    public function store(array $data)
-    {
-        return Role::create($data);
-    }
 }
