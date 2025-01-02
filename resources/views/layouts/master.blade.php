@@ -452,6 +452,27 @@
 
     <script type="text/javascript" src="https://demo.dashboardpack.com/architectui-html-free/assets/scripts/main.js"></script>
     @stack('scripts')
+    <script>
+        function toggleDropdown(event) {
+            event.preventDefault();
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            if (dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.remove('hidden');
+            } else {
+                dropdownMenu.classList.add('hidden');
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const userMenu = document.getElementById('user-menu');
+            const dropdownMenu = document.getElementById('dropdown-menu');
+            
+            if (!userMenu.contains(event.target) && !dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>
