@@ -2,84 +2,133 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\CreateCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Categories;
 use App\Repositories\Category\CategoryRepositoryInterface;
-use App\Models\Category;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CategoriesController extends Controller
 {
     private $categoryRepository;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepository) {
+    public function __construct(CategoryRepositoryInterface $categoryRepository)
+    {
         $this->middleware('auth');
         $this->categoryRepository = $categoryRepository;
     }
 
-    public function index() {
-        $categories = $this->categoryRepository->index();
+    /**
+     * Display a listing of categories
+     */
+    public function index(): View
+    {
+        $categories = $this->categoryRepository->getAllCategories(10);
         return view('categories.index', compact('categories'));
     }
 
-    public function create() {
+    /**
+     * Show the form for creating a new category
+     */
+    public function create(): View
+    {
         return view('categories.create');
     }
 
-    public function store(CategoryRequest $request) {
+    /**
+     * Store a newly created category
+     */
+    public function store(CreateCategoryRequest $request): RedirectResponse
+    {
         $validatedData = $request->validated();
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
-            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+            $validatedData['image'] = $imageName;
         }
 
         $this->categoryRepository->store($validatedData);
-        return redirect()->route('categories.index');
+        return redirect()->route('categories.index')
+            ->with('success', 'Category created successfully');
     }
 
-    public function destroy($id)
+    /**
+     * Display the specified category
+     */
+    public function show(int $id): View
     {
-        $category = Categories::findOrFail($id);
-        $productsCount = $category->products()->count();
+        $category = $this->categoryRepository->getCategoryWithProducts($id);
+        abort_if(!$category, 404, 'Category not found');
 
-        if ($productsCount > 0) {
-            $products = $category->products;
-            return view('categories.confirm-delete', compact('category', 'products'));
-        }
-
-        $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Category deleted successfully');
-    }
-
-    public function forceDelete($id)
-    {
-        $category = Categories::findOrFail($id);
-        $category->products()->delete(); // Delete associated products
-        $category->delete();
-        return redirect()->route('categories.index')->with('success', 'Category and its products deleted successfully');
-    }
-
-    public function show($id) {
-        $category = $this->categoryRepository->show($id);
         return view('categories.show', compact('category'));
     }
 
-    public function edit($id) {
-        $category = $this->categoryRepository->show($id);
+    /**
+     * Show the form for editing the specified category
+     */
+    public function edit(int $id): View
+    {
+        $category = $this->categoryRepository->findById($id);
+        abort_if(!$category, 404, 'Category not found');
+
         return view('categories.edit', compact('category'));
     }
 
-    public function update(CategoryRequest $request, $id) {
+    /**
+     * Update the specified category
+     */
+    public function update(UpdateCategoryRequest $request, int $id): RedirectResponse
+    {
         $validatedData = $request->validated();
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
-            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+            $validatedData['image'] = $imageName;
         }
 
-        $this->categoryRepository->update($validatedData, $id);
-        return redirect()->route('categories.index');
+        $category = $this->categoryRepository->update($validatedData, $id);
+        abort_if(!$category, 404, 'Category not found');
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Category updated successfully');
+    }
+
+    /**
+     * Remove the specified category
+     */
+    public function destroy(int $id): RedirectResponse|View
+    {
+        $category = $this->categoryRepository->getCategoryWithProducts($id);
+        abort_if(!$category, 404, 'Category not found');
+
+        if ($category->products()->count() > 0) {
+            return view('categories.confirm-delete', [
+                'category' => $category,
+                'products' => $category->products
+            ]);
+        }
+
+        $this->categoryRepository->delete($id);
+        return redirect()->route('categories.index')
+            ->with('success', 'Category deleted successfully');
+    }
+
+    /**
+     * Force delete category and its products
+     */
+    public function forceDelete(int $id): RedirectResponse
+    {
+        $category = $this->categoryRepository->getCategoryWithProducts($id);
+        abort_if(!$category, 404, 'Category not found');
+
+        $category->products()->delete();
+        $this->categoryRepository->delete($id);
+
+        return redirect()->route('categories.index')
+            ->with('success', 'Category and its products deleted successfully');
     }
 }

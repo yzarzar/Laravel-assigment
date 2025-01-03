@@ -52,6 +52,14 @@
                         </a>
                     </li>
                 @endcan
+                @can('permission-list')
+                    <li>
+                        <a href="{{ route('permissions.index') }}" class="{{ request()->is('permissions*') ? 'mm-active' : '' }}">
+                            <i class="fas fa-key metismenu-icon"></i>
+                            Permissions
+                        </a>
+                    </li>
+                @endcan
                 <li>
                     <a href="{{ route('products.index') }}" class="{{ request()->is('products*') ? 'mm-active' : '' }}">
                         <i class="fas fa-box metismenu-icon"></i>

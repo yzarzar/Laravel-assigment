@@ -14,7 +14,7 @@
             </div>
             <div class="page-title-actions">
                 <a href="{{ route('roles.index') }}" class="btn-shadow btn btn-info">
-                    <span class="btn-icon-wrapper pr-2 opacity-7">
+                    <span class="pr-2 btn-icon-wrapper opacity-7">
                         <i class="fas fa-arrow-left fa-w-20"></i>
                     </span>
                     Back to Roles
@@ -25,7 +25,7 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="main-card mb-3 card">
+            <div class="mb-3 main-card card">
                 <div class="card-header">Create Role</div>
                 <div class="card-body">
                     @if($errors->any())
@@ -37,21 +37,21 @@
                             </ul>
                         </div>
                     @endif
-                    
+
                     <form action="{{ route('roles.store') }}" method="POST">
                         @csrf
                         <div class="position-relative form-group">
                             <label for="name">Role Name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}" required>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ old('name') }}">
                         </div>
-                        
+
                         <div class="position-relative form-group">
                             <label>Permissions</label>
                             <div class="row">
                                 @foreach($permissions as $permission)
                                     <div class="col-md-3">
                                         <div class="position-relative form-check">
-                                            <input class="form-check-input" type="checkbox" name="permissions[]" 
+                                            <input class="form-check-input" type="checkbox" name="permissions[]"
                                                 value="{{ $permission->name }}" id="permission{{ $permission->id }}"
                                                 {{ (old('permissions') && in_array($permission->name, old('permissions'))) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="permission{{ $permission->id }}">
@@ -62,7 +62,7 @@
                                 @endforeach
                             </div>
                         </div>
-                        
+
                         <button type="submit" class="mt-2 btn btn-primary">Create Role</button>
                     </form>
                 </div>

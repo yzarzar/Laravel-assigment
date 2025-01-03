@@ -2,77 +2,144 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProductRequest;
+use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Categories;
-use App\Models\Products;
-use App\Repositories\Category\CategoryRepositoryInterface;
 use App\Repositories\Product\ProductRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ProductsController extends Controller
 {
     private $productRepository;
-    private $categoriesRepository;
 
-    public function __construct(ProductRepositoryInterface $productRepository, CategoryRepositoryInterface $categoriesRepository) {
+    public function __construct(ProductRepositoryInterface $productRepository)
+    {
         $this->middleware('auth');
         $this->productRepository = $productRepository;
-        $this->categoriesRepository = $categoriesRepository;
     }
 
-    public function index() {
-        $products = $this->productRepository->index();
-        return view('products.index', compact('products'));
+    /**
+     * Display a listing of products
+     */
+    public function index(Request $request): View
+    {
+        $products = $this->productRepository->getAllProducts(
+            10,
+            ['category']
+        );
+        $categories = Categories::all();
+
+        return view('products.index', compact('products', 'categories'));
     }
 
-    public function create() {
-        $categories = $this->categoriesRepository->index();
+    /**
+     * Show the form for creating a new product
+     */
+    public function create(): View
+    {
+        $categories = Categories::all();
         return view('products.create', compact('categories'));
     }
 
-    public function show($id) {
-        $product = $this->productRepository->show($id);
+    /**
+     * Store a newly created product
+     */
+    public function store(CreateProductRequest $request): RedirectResponse
+    {
+        $validatedData = $request->validated();
+
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('images'), $imageName);
+            $validatedData['image'] = $imageName;
+        }
+
+        // Status is already converted to boolean in CreateProductRequest
+        $this->productRepository->store($validatedData);
+        return redirect()->route('products.index')
+            ->with('success', 'Product created successfully');
+    }
+
+    /**
+     * Display the specified product
+     */
+    public function show(int $id): View
+    {
+        $product = $this->productRepository->findById($id, ['category']);
+        abort_if(!$product, 404, 'Product not found');
+
         return view('products.show', compact('product'));
     }
 
-    public function destroy($id) {
-        $this->productRepository->delete($id);
-        return redirect()->route('products.index');
-    }
+    /**
+     * Show the form for editing the specified product
+     */
+    public function edit(int $id): View
+    {
+        $product = $this->productRepository->findById($id);
+        abort_if(!$product, 404, 'Product not found');
 
-    public function store(ProductRequest $request) {
-        $validatedData = $request->validated();
-
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
-            $validatedData = array_merge($validatedData, ['image' => $imageName]);
-        }
-
-        $validatedData['status'] = $request->has('status');
-
-        $this->productRepository->store($validatedData);
-        return redirect()->route('products.index');
-    }
-
-    public function edit($id) {
-        $product = $this->productRepository->show($id);
-        $categories = $this->categoriesRepository->index();
+        $categories = Categories::all();
         return view('products.edit', compact('product', 'categories'));
     }
 
-    public function update(ProductRequest $request, $id) {
+    /**
+     * Update the specified product
+     */
+    public function update(UpdateProductRequest $request, int $id): RedirectResponse
+    {
         $validatedData = $request->validated();
-
-        $validatedData['status'] = $request->has('status');
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('images'), $imageName);
-            $validatedData = array_merge($validatedData, ['image' => $imageName]);
+            $validatedData['image'] = $imageName;
         }
 
-        $this->productRepository->update($validatedData, $id);
-        return redirect()->route('products.index');
+        // Status is already converted to boolean in UpdateProductRequest
+        $product = $this->productRepository->update($validatedData, $id);
+        abort_if(!$product, 404, 'Product not found');
+
+        return redirect()->route('products.index')
+            ->with('success', 'Product updated successfully');
+    }
+
+    /**
+     * Remove the specified product
+     */
+    public function destroy(int $id): RedirectResponse
+    {
+        $product = $this->productRepository->findById($id);
+        abort_if(!$product, 404, 'Product not found');
+
+        $this->productRepository->delete($id);
+        return redirect()->route('products.index')
+            ->with('success', 'Product deleted successfully');
+    }
+
+    /**
+     * Filter products by category
+     */
+    public function filterByCategory(Request $request): View
+    {
+        $categoryId = $request->input('category_id');
+        $products = $this->productRepository->getProductsByCategory($categoryId, 10);
+        $categories = Categories::all();
+
+        return view('products.index', compact('products', 'categories'));
+    }
+
+    /**
+     * Search products
+     */
+    public function search(Request $request): View
+    {
+        $query = $request->input('query');
+        $products = $this->productRepository->searchProducts($query, 10);
+        $categories = Categories::all();
+
+        return view('products.index', compact('products', 'categories'));
     }
 }

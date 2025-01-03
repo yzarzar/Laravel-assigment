@@ -7,23 +7,73 @@ use Spatie\Permission\Models\Permission;
 
 class RoleRepository implements RoleRepositoryInterface
 {
-    public function index()
+    protected $roleModel;
+    protected $permissionModel;
+
+    public function __construct(Role $role, Permission $permission)
     {
-        return Role::with('permissions')->get();
+        $this->roleModel = $role;
+        $this->permissionModel = $permission;
     }
 
-    public function getPermissions()
+    public function getAllRoles()
     {
-        return Permission::all();
+        return $this->roleModel->with('permissions')->get();
     }
 
-    public function create(array $data)
+    public function getAllPermissions()
     {
-        return Role::create($data);
+        return $this->permissionModel->all();
     }
 
-    public function store(array $data)
+    public function createRole(array $data, ?array $permissions = null)
     {
-        return Role::create($data);
+        $role = $this->roleModel->create($data);
+        
+        if ($permissions) {
+            $role->syncPermissions($permissions);
+        }
+        
+        return $role->load('permissions');
+    }
+
+    public function findRoleById($id)
+    {
+        return $this->roleModel->with('permissions')->findOrFail($id);
+    }
+
+    public function updateRole(array $data, $id, ?array $permissions = null)
+    {
+        $role = $this->findRoleById($id);
+        $role->update($data);
+        
+        if ($permissions !== null) {
+            $role->syncPermissions($permissions);
+        }
+        
+        return $role->fresh('permissions');
+    }
+
+    public function deleteRole($id)
+    {
+        $role = $this->findRoleById($id);
+        
+        if ($role->name === 'admin') {
+            throw new \Exception('Cannot delete admin role');
+        }
+        
+        return $role->delete();
+    }
+
+    public function hasUsers($id)
+    {
+        $role = $this->findRoleById($id);
+        return $role->users()->exists();
+    }
+
+    public function getRoleUsers($id)
+    {
+        $role = $this->findRoleById($id);
+        return $role->users;
     }
 }

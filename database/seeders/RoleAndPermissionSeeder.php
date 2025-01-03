@@ -21,6 +21,12 @@ class RoleAndPermissionSeeder extends Seeder
         // Admin only permission
         $dashboard = Permission::create(['name' => 'dashboard']);
 
+        // Permission management permissions
+        $permissionList = Permission::create(['name' => 'permission-list']);
+        $permissionCreate = Permission::create(['name' => 'permission-create']);
+        $permissionEdit = Permission::create(['name' => 'permission-edit']);
+        $permissionDelete = Permission::create(['name' => 'permission-delete']);
+
         // Role management permissions
         $roleList = Permission::create(['name' => 'role-list']);
         $roleCreate = Permission::create(['name' => 'role-create']);
@@ -74,6 +80,11 @@ class RoleAndPermissionSeeder extends Seeder
             $roleCreate,
             $roleEdit,
             $roleDelete,
+            // Permissions
+            $permissionList,
+            $permissionCreate,
+            $permissionEdit,
+            $permissionDelete
         ]);
 
         // Give manager permissions
@@ -96,6 +107,11 @@ class RoleAndPermissionSeeder extends Seeder
             $roleCreate,
             $roleEdit,
             $roleDelete,
+            // Permissions
+            $permissionList,
+            $permissionCreate,
+            $permissionEdit,
+            $permissionDelete,
         ]);
 
         // Give regular user permissions

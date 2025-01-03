@@ -3,41 +3,90 @@
 namespace App\Repositories\User;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Role;
+use Illuminate\Http\UploadedFile;
 
 class UserRepository implements UserRepositoryInterface
 {
-    public function index()
+    protected $userModel;
+    protected $roleModel;
+
+    public function __construct(User $user, Role $role)
     {
-        return User::latest()->paginate(5);
+        $this->userModel = $user;
+        $this->roleModel = $role;
     }
 
-    public function show($id)
+    public function getAllUsers()
     {
-        return User::findOrFail($id);
+        return $this->userModel->with('roles')
+            ->latest()
+            ->paginate(5);
     }
 
-    public function store(array $data)
+    public function findUserById($id)
     {
-        return User::create($data);
+        return $this->userModel->with('roles')->findOrFail($id);
     }
 
-    public function update(array $data, $id)
+    public function createUser(array $data)
     {
-        $user = User::findOrFail($id);
-        $user->update($data);
-        return $user;
-    }
-
-    public function delete($id)
-    {
-        $user = User::findOrFail($id);
-        if ($user->image) {
-            $imagePath = public_path('images/') . $user->image;
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
         }
+
+        return $this->userModel->create($data);
+    }
+
+    public function updateUser(array $data, $id)
+    {
+        $user = $this->findUserById($id);
+
+        if (isset($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
+        return $user->fresh('roles');
+    }
+
+    public function deleteUser($id)
+    {
+        $user = $this->findUserById($id);
+        
+        if ($user->image) {
+            $this->deleteImage($user->image);
+        }
+        
         return $user->delete();
+    }
+
+    public function handleImageUpload(UploadedFile $image, $oldImage = null)
+    {
+        if ($oldImage) {
+            $this->deleteImage($oldImage);
+        }
+
+        $imageName = time() . '_' . $image->getClientOriginalName();
+        $image->move(public_path('images'), $imageName);
+        
+        return $imageName;
+    }
+
+    public function getAllRoles()
+    {
+        return $this->roleModel->all();
+    }
+
+    protected function deleteImage($imageName)
+    {
+        $imagePath = public_path('images/' . $imageName);
+        if (file_exists($imagePath)) {
+            unlink($imagePath);
+        }
     }
 }

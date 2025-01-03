@@ -32,7 +32,7 @@ class UserRequest extends FormRequest
             'image' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'address' => 'nullable|string|max:1000',
             'phone' => 'nullable|string|max:20|regex:/^([0-9\s\-\+\(\)]*)$/',
-            'role' => ['nullable', Rule::in($roles)],
+            'roles' => ['nullable', Rule::in($roles)],
         ];
 
         // Only require password for new users

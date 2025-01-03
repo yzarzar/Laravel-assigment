@@ -1,23 +1,24 @@
 @extends('layouts.master')
+
 @section('content')
     <div class="app-main__inner">
         <div class="app-page-title">
             <div class="page-title-wrapper">
                 <div class="page-title-heading">
                     <div class="page-title-icon">
-                        <i class="fas fa-user-shield icon-gradient bg-mean-fruit"></i>
+                        <i class="fas fa-key icon-gradient bg-mean-fruit"></i>
                     </div>
-                    <div>Roles Management
-                        <div class="page-title-subheading">Manage user roles and their permissions</div>
+                    <div>Permissions Management
+                        <div class="page-title-subheading">Manage system permissions for roles and users</div>
                     </div>
                 </div>
                 <div class="page-title-actions">
-                    @can('role-create')
-                        <a href="{{ route('roles.create') }}" class="btn-shadow btn btn-info">
+                    @can('permission-create')
+                        <a href="{{ route('permissions.create') }}" class="btn-shadow btn btn-info">
                             <span class="pr-2 btn-icon-wrapper opacity-7">
                                 <i class="fas fa-plus fa-w-20"></i>
                             </span>
-                            Create New Role
+                            Create New Permission
                         </a>
                     @endcan
                 </div>
@@ -42,52 +43,46 @@
                     </div>
                 @endif
                 <div class="mb-3 main-card card">
-                    <div class="card-header">Roles List</div>
+                    <div class="card-header">Permissions List ({{ count($permissions) }})</div>
                     <div class="table-responsive">
                         <table class="table mb-0 align-middle table-borderless table-striped table-hover">
                             <thead>
                                 <tr>
-                                    <th>Role Name</th>
-                                    <th>Permissions</th>
+                                    <th>#</th>
+                                    <th>Permission Name</th>
                                     <th class="text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($roles as $role)
+                                @foreach ($permissions as $key => $permission)
                                     <tr>
+                                        <td>{{ $key + 1 }}</td>
                                         <td>
                                             <div class="p-0 widget-content">
                                                 <div class="widget-content-wrapper">
                                                     <div class="widget-content-left flex2">
-                                                        <div class="widget-heading">{{ $role->name }}</div>
+                                                        <div class="widget-heading">{{ $permission->name }}</div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td style="width: 800px;">
-                                            @foreach ($role->permissions as $permission)
-                                                <span class="badge badge-info"
-                                                    style="margin-right: 5px;">{{ $permission->name }}</span>
-                                            @endforeach
-                                        </td>
                                         <td class="text-center">
-                                            @can('role-edit')
-                                                <a href="{{ route('roles.edit', $role) }}" class="btn btn-primary btn-sm">
+                                            @can('permission-edit')
+                                                <a href="{{ route('permissions.edit', $permission->id) }}"
+                                                    class="btn btn-info btn-sm">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                             @endcan
-                                            @if ($role->name !== 'admin')
-                                                <form action="{{ route('roles.destroy', $role) }}" method="POST"
-                                                    class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    @can('role-delete')
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    @endcan
-                                                </form>
-                                            @endif
+                                            <form action="{{ route('permissions.destroy', $permission->id) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                @can('permission-delete')
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @endcan
+                                            </form>
                                         </td>
                                     </tr>
                                 @endforeach

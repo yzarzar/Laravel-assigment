@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Repositories\Role\RoleRepositoryInterface;
 
@@ -18,61 +21,104 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = $this->roleRepository->index();
-        return view('roles.index', compact('roles'));
+        try {
+            $roles = $this->roleRepository->getAllRoles();
+            return view('roles.index', compact('roles'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error fetching roles: ' . $e->getMessage());
+        }
     }
 
     public function create()
     {
-        $permissions = $this->roleRepository->getPermissions();
-        return view('roles.create', compact('permissions'));
+        try {
+            $permissions = $this->roleRepository->getAllPermissions();
+            return view('roles.create', compact('permissions'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error loading permissions: ' . $e->getMessage());
+        }
     }
 
-    public function store(Request $request)
+    public function store(CreateRoleRequest $request)
     {
-        $request->validate([
-            'name' => 'required|unique:roles,name'
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $role = $this->roleRepository->create(['name' => $request->name]);
-        if($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+            $role = $this->roleRepository->createRole(
+                ['name' => $request->name],
+                $request->permissions
+            );
+
+            DB::commit();
+            return redirect()->route('roles.index')->with('success', 'Role created successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error creating role: ' . $e->getMessage());
         }
-
-        return redirect()->route('roles.index')
-            ->with('success', 'Role created successfully');
     }
 
     public function edit(Role $role)
     {
-        $permissions = $this->roleRepository->getPermissions();
-        return view('roles.edit', compact('role', 'permissions'));
+        try {
+            $permissions = $this->roleRepository->getAllPermissions();
+            return view('roles.edit', compact('role', 'permissions'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error loading permissions: ' . $e->getMessage());
+        }
     }
 
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        $request->validate([
-            'name' => 'required|unique:roles,name,' . $role->id
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $role->update(['name' => $request->name]);
-        if($request->has('permissions')) {
-            $role->syncPermissions($request->permissions);
+            $role->update(['name' => $request->name]);
+            if($request->has('permissions')) {
+                $role->syncPermissions($request->permissions);
+            }
+
+            DB::commit();
+            return redirect()->route('roles.index')->with('success', 'Role updated successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error updating role: ' . $e->getMessage());
         }
-
-        return redirect()->route('roles.index')
-            ->with('success', 'Role updated successfully');
     }
 
     public function destroy(Role $role)
     {
-        if($role->name === 'admin') {
-            return redirect()->route('roles.index')
-                ->with('error', 'Cannot delete admin role');
-        }
+        try {
+            if($role->name === 'admin') {
+                return redirect()->route('roles.index')
+                    ->with('error', 'Cannot delete admin role');
+            }
 
-        $role->delete();
-        return redirect()->route('roles.index')
-            ->with('success', 'Role deleted successfully');
+            if($role->users()->count() > 0) {
+                $users = $role->users()->pluck('name')->implode(', ');
+                return view('roles.confirm-delete', compact('role', 'users'));
+            }
+
+            $role->delete();
+            return redirect()->route('roles.index')
+                ->with('success', 'Role deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error deleting role: ' . $e->getMessage());
+        }
+    }
+
+    public function forceDelete($id)
+    {
+        try {
+            $role = $this->roleRepository->findRoleById($id);
+            $role->users()->delete(); // Delete associated users
+            $role->delete();
+            return redirect()->route('roles.index')->with('success', 'Role and its users deleted successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Error deleting role and its users: ' . $e->getMessage());
+        }
     }
 }
